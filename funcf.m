@@ -1,7 +1,5 @@
-function output = funcf(t, p)
-global Omegat
-omega_g = 3.2 * 1.6e-19 / (6.63e-34);
-% gamma = 0.2e12;
-% output=2*imag(Omegat(1) * exp(1i * omega_g * t) * p)/(6.63e-34);
-output=imag(Omegat(t) * p)*2;
+function output = funcf(j, p)
+global A dt
+ output=(imag(((A*p)+0.01*exp(-(j*dt-3e-13)^2/(1e-13)^2)).* p)*2)*2*pi/6.63*10^34*4.18e-3*1.6e-19;
 end
+
