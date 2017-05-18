@@ -9,7 +9,7 @@ t_end1 = 30e-13;
 Nt = 300;
 dt = t_end1/Nt;
 ymax = 4;
-N = 1000;
+N = 100;
 ygrid = ymax/N;
 p = zeros(N,round(Nt+1));  f = zeros(N,round(Nt+1));                %the function that is about to be solved
 p(:,1) = p0; 
@@ -23,11 +23,13 @@ omegar = Ebind/hbar;
 gamma = 0.38e-3*1.6e-19;
 time = (0:Nt)*dt;
 
-sigmat = 0.3e-13;
+sigmat = 0.5e-13;
 tstart = -3*sigmat;
 
 Et = 1e-3*Ebind*exp(-((1:Nt+1)*dt+tstart).^2/(sigmat)^2);
-% p(:,1) =  1e-3*Ebind*exp(-((1:N+1)'*dt+tstart).^2/(sigmat)^2);
+%p(:,1) =  1e-3*Ebind*exp(-((1:N)'*dt+tstart).^2/(sigmat)^2);
+pfreq = zeros(1,Nt+1);
+freqgrid = ((0:(Nt))/(Nt+1)-1/2)*16*1e-3*1.6e-19/hbar;
 %%
 %------------------------------------------------------------
 N1=100;                 %number of points of phi
@@ -77,8 +79,7 @@ end
 for j = 1:(Nt+1)
     pt(j) = ygrid*y*p(:,j);
 end
-pfreq = zeros(1,Nt+1);
-freqgrid = ((0:Nt)/(Nt+1)* 2*omegar-omegar)*16;
+
 for i=1:(Nt)
     pfreq = runge_kuttaFT(pfreq,i);
 end
@@ -90,10 +91,15 @@ Efreq = zeros(1,Nt+1);
 for i=1:(Nt+1)
     Efreq = runge_kuttaFT_E(Efreq,i);
 end
+% plot(time,abs(pt).^2/max(abs(pt).^2))
+% hold on
+% plot(time(1:51), abs(sqrt(0.1*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)).^2))/max(abs(sqrt(0.1*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)).^2))));
+% hold on
+% plot(time(51:end), 0.1*((exp(gamma/hbar*50*dt)-1)/(gamma/hbar*50*dt)*exp(-gamma/hbar*((time(51:end)))).^2)/max(0.1*((exp(gamma/hbar*50*dt)-1)/(gamma/hbar*50*dt)*exp(-gamma/hbar*((time(51:end)))).^2)))
 
-%%
+%
 subplot(3,1,1)
-plot(abs(p(:,Nt+1).^2))
+plot(abs(p(:,end).^2))
 head = sprintf('%s    |Pk|^2 at the end', date);
 title(head)
 
@@ -104,7 +110,7 @@ h.LineStyle = 'None';
 h.ShowBaseLine = 'off';
 hold on
 
-plot(time,abs(pt.^2)/max(abs(pt.^2)))
+plot(time,abs(pt).^2/max(abs(pt).^2))
 
 hold on
 
