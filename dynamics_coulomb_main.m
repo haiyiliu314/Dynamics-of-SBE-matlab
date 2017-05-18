@@ -1,25 +1,33 @@
 clear all
-global gamma A y dt freqgrid pt Ebind
+global gamma A y dt freqgrid pt Ebind sigmat tstart hbar
 %%  Initialization for dynamics
 p0 = 0; f0 = 0;                                             %initial value
 % t_end = 1e-12;
 t_end1 = 30e-13;  
 % dt1(1,j) = dt;                            %time step record
 % tgrid = round(t_end/dt);                                               %number of time steps
-Nt = 200;
+Nt = 300;
 dt = t_end1/Nt;
 ymax = 4;
 N = 1000;
 ygrid = ymax/N;
 p = zeros(N,round(Nt+1));  f = zeros(N,round(Nt+1));                %the function that is about to be solved
-p(:,1) = p0; f(:,1) = f0;                                       %set the initial value
+p(:,1) = p0; 
+f(:,1) = f0;                                       %set the initial value
 T = 0.1e-12;
 pt = zeros(1,Nt+1);
+
 hbar = 6.624e-34/2/pi;
 Ebind = 4.18e-3*1.6e-19;
 omegar = Ebind/hbar;
-gamma = 0.39e-3*1.6e-19;
+gamma = 0.38e-3*1.6e-19;
 time = (0:Nt)*dt;
+
+sigmat = 0.3e-13;
+tstart = -3*sigmat;
+
+Et = 1e-3*Ebind*exp(-((1:Nt+1)*dt+tstart).^2/(sigmat)^2);
+% p(:,1) =  1e-3*Ebind*exp(-((1:N+1)'*dt+tstart).^2/(sigmat)^2);
 %%
 %------------------------------------------------------------
 N1=100;                 %number of points of phi
@@ -77,7 +85,7 @@ end
 
 
 %FFT of electric field
-Et = exp(-((1:Nt+1)*dt-3e-13).^2/(1e-13)^2);
+
 Efreq = zeros(1,Nt+1);
 for i=1:(Nt+1)
     Efreq = runge_kuttaFT_E(Efreq,i);
@@ -90,7 +98,7 @@ head = sprintf('%s    |Pk|^2 at the end', date);
 title(head)
 
 subplot(3,1,2)
-h = area(time, Et);
+h = area(time, Et/max(Et));
 h.FaceColor = 0.8*[1,1,1];
 h.LineStyle = 'None';
 h.ShowBaseLine = 'off';
@@ -112,11 +120,15 @@ title(head)
 
 
 figure
-subplot(2,1,1)
-plot(imag(pfreq))
-title('Im[P({\omega} )]')
+subplot(3,1,1)
+plot(freqgrid/(1.6e-19*1e-3)*hbar, imag(pfreq))
+title('Im[P({\omega})]')
 
-subplot(2,1,2)
-plot(imag(pfreq)./abs(Efreq))
-title( 'Im[P({\omega} )]/E({\omega})]')
+subplot(3,1,2)
+plot(freqgrid/(1.6e-19*1e-3)*hbar, imag(pfreq)./abs(Efreq))
+title( 'Im[P({\omega})]/|E({\omega})|')
 
+subplot(3,1,3)
+plot(freqgrid/(1.6e-19*1e-3)*hbar, abs(Efreq))
+title('|E(\omega)|')
+xlabel('h\omega -(E_g+E_{1s})[meV]')

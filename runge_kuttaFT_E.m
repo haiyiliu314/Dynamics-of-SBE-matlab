@@ -8,7 +8,7 @@ function g = runge_kuttaFT_E(g1, i)
 end
 
 function output = funcFT(j)
-    global dt freqgrid
-    Et = exp(-(j*dt-3e-13)^2/(1e-13)^2);
+    global dt freqgrid sigmat tstart
+    Et = exp(-(j*dt+tstart)^2/(sigmat)^2);
     output = Et*exp(1i*freqgrid*(dt*j));
 end
