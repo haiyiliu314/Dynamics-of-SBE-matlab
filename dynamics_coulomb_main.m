@@ -1,9 +1,9 @@
 clear all
-global gamma A y dt freqgrid pt Ebind sigmat tstart hbar ygrid
+global gamma A y dt freqgrid pt Ebind sigmat tstart hbar ygrid 
 %%  Initialization for dynamics
 p0 = 0; f0 = 0;                                             %initial value
 % t_end = 1e-12;
-t_end1 = 1e-12;  
+t_end1 = 1;  %ps
 % dt1(1,j) = dt;                            %time step record
 % tgrid = round(t_end/dt);                                               %number of time steps
 Nt = 2000;
@@ -14,22 +14,21 @@ ygrid = ymax/N;
 p = zeros(N,round(Nt+1));  f = zeros(N,round(Nt+1));                %the function that is about to be solved
 p(:,1) = p0; 
 f(:,1) = f0;                                       %set the initial value
-T = 0.1e-12;
+T = 0.1;
 pt = zeros(1,Nt+1);
 
-hbar = 6.623e-34/2/pi;
-Ebind = 4.18e-3*1.6e-19;
+hbar = 4.135667662/2/pi;                                %meV*ps    
+Ebind = 4.18;  %meV
 omegar = Ebind/hbar;
-gamma = 0.38e-3*1.6e-19;
+gamma = 0.38;  %meV
 time = (0:Nt)*dt;
 
-sigmat = 0.5e-13;
+sigmat = 0.05;
 tstart = -3*sigmat;
-
 Et = 1e-3*Ebind*exp(-((1:Nt+1)*dt+tstart).^2/(sigmat)^2);
 %p(:,1) =  1e-3*Ebind*exp(-((1:N)'*dt+tstart).^2/(sigmat)^2);
 pfreq = zeros(1,Nt+1);
-freqgrid = ((0:(Nt))/(Nt+1)-1/2)*16*1e-3*1.6e-19/hbar;
+freqgrid = ((0:(Nt))/(Nt+1)-1/2)*16/hbar;          %THz
 %%
 %------------------------------------------------------------
 N1=100;                 %number of points of phi
@@ -133,14 +132,14 @@ title(head)
 
 figure
 subplot(3,1,1)
-plot(freqgrid/(1.6e-19*1e-3)*hbar, imag(pfreq))
+plot(freqgrid*hbar, imag(pfreq))
 title('Im[P({\omega})]')
 
 subplot(3,1,2)
-plot(freqgrid/(1.6e-19*1e-3)*hbar, imag(pfreq)./abs(Efreq))
+plot(freqgrid*hbar, imag(pfreq)./abs(Efreq))
 title( 'Im[P({\omega})]/|E({\omega})|')
 
 subplot(3,1,3)
-plot(freqgrid/(1.6e-19*1e-3)*hbar, abs(Efreq))
+plot(freqgrid*hbar, abs(Efreq))
 title('|E(\omega)|')
 xlabel('h\omega -(E_g+E_{1s})[meV]')

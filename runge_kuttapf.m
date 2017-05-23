@@ -1,6 +1,6 @@
 function [f, g] = runge_kuttapf(f1, g1, i)
-    global dt
-%     t = dt * i;
+
+global dt
     kg1 = dt * funcp(i,f1, g1);
     kf1 = dt * funcf(i,g1);
     kg2 = dt * funcp(i+1/2, f1 + kf1/2, g1 + kg1/2);
