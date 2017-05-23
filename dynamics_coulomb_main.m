@@ -1,12 +1,12 @@
 clear all
-global gamma A y dt freqgrid pt Ebind sigmat tstart hbar
+global gamma A y dt freqgrid pt Ebind sigmat tstart hbar ygrid
 %%  Initialization for dynamics
 p0 = 0; f0 = 0;                                             %initial value
 % t_end = 1e-12;
-t_end1 = 30e-13;  
+t_end1 = 1e-12;  
 % dt1(1,j) = dt;                            %time step record
 % tgrid = round(t_end/dt);                                               %number of time steps
-Nt = 300;
+Nt = 2000;
 dt = t_end1/Nt;
 ymax = 4;
 N = 100;
@@ -17,7 +17,7 @@ f(:,1) = f0;                                       %set the initial value
 T = 0.1e-12;
 pt = zeros(1,Nt+1);
 
-hbar = 6.624e-34/2/pi;
+hbar = 6.623e-34/2/pi;
 Ebind = 4.18e-3*1.6e-19;
 omegar = Ebind/hbar;
 gamma = 0.38e-3*1.6e-19;
@@ -70,14 +70,13 @@ A=-1*A*dN/pi;
 %RK method to compute polarization and occupation
 
 for n=1:Nt
-    p(:,n+1) = runge_kuttap(f(:,n), p(:,n), n);
-    f(:,n+1) = runge_kuttaf(f(:,n), p(:,n), n);
+    [f(:,n+1), p(:,n+1)] = runge_kuttapf(f(:,n), p(:,n), n);
 end
 
 %%
 %FFT of polarization
 for j = 1:(Nt+1)
-    pt(j) = ygrid*y*p(:,j);
+    pt(j) = ygrid*sum(p(:,j));
 end
 
 for i=1:(Nt)
@@ -91,14 +90,21 @@ Efreq = zeros(1,Nt+1);
 for i=1:(Nt+1)
     Efreq = runge_kuttaFT_E(Efreq,i);
 end
-% plot(time,abs(pt).^2/max(abs(pt).^2))
-% hold on
-% plot(time(1:51), abs(sqrt(0.1*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)).^2))/max(abs(sqrt(0.1*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)).^2))));
-% hold on
-% plot(time(51:end), 0.1*((exp(gamma/hbar*50*dt)-1)/(gamma/hbar*50*dt)*exp(-gamma/hbar*((time(51:end)))).^2)/max(0.1*((exp(gamma/hbar*50*dt)-1)/(gamma/hbar*50*dt)*exp(-gamma/hbar*((time(51:end)))).^2)))
 
-%
+
+% figure
+% for i= 1:N
+% plot(time,abs(p(N,:))/max(abs(p(N,:))))
+% hold on
+% end
+% hold on
+% plot(time(1:51), abs(sqrt(1e-3*Ebind/hbar*(50*dt))*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)))/max(abs(sqrt(1e-3*Ebind/hbar*(50*dt)*((1-exp(-gamma/hbar*(0:50)*dt)) / (gamma/hbar*50*dt)).^2))));
+% hold on
+% plot(time(51:end), (exp(gamma/hbar*25*dt)+exp(-gamma/hbar*25*dt))/(gamma/hbar*25*dt*50*dt)*exp(-gamma/hbar*(51:(Nt+1))*dt)/max((exp(gamma/hbar*25*dt)+exp(-gamma/hbar*25*dt))/(gamma/hbar*25*dt*50*dt)*exp(-gamma/hbar*(51:(Nt+1))*dt)))
+
+%%
 subplot(3,1,1)
+
 plot(abs(p(:,end).^2))
 head = sprintf('%s    |Pk|^2 at the end', date);
 title(head)
