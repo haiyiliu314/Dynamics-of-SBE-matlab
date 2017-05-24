@@ -1,34 +1,35 @@
 clear all
-global gamma A y dt freqgrid pt Ebind sigmat tstart hbar ygrid 
+global gamma A y dt freqgrid pt Ebind sigmat tstart hbar ygrid shift
 %%  Initialization for dynamics
 p0 = 0; f0 = 0;                                             %initial value
 % t_end = 1e-12;
-t_end1 = 1;  %ps
+t_end1 = 5;  %ps
 % dt1(1,j) = dt;                            %time step record
 % tgrid = round(t_end/dt);                                               %number of time steps
-Nt = 2000;
+Nt = 5000;
 dt = t_end1/Nt;
 ymax = 4;
 N = 100;
 ygrid = ymax/N;
 p = zeros(N,round(Nt+1));  f = zeros(N,round(Nt+1));                %the function that is about to be solved
 p(:,1) = p0; 
-f(:,1) = f0;                                       %set the initial value
+f(:,1) = f0;                                            %set the initial value
 T = 0.1;
 pt = zeros(1,Nt+1);
 
 hbar = 4.135667662/2/pi;                                %meV*ps    
 Ebind = 4.18;  %meV
 omegar = Ebind/hbar;
-gamma = 0.38;  %meV
+gamma = 0.19;  %meV
 time = (0:Nt)*dt;
+shift = 3;
 
 sigmat = 0.05;
 tstart = -3*sigmat;
-Et = 1e-3*Ebind*exp(-((1:Nt+1)*dt+tstart).^2/(sigmat)^2);
+Et = 1e-3*Ebind*exp(-((1:Nt+1)*dt+tstart).^2/(sqrt(2)*sigmat)^2);
 %p(:,1) =  1e-3*Ebind*exp(-((1:N)'*dt+tstart).^2/(sigmat)^2);
 pfreq = zeros(1,Nt+1);
-freqgrid = ((0:(Nt))/(Nt+1)-1/2)*16/hbar;          %THz
+freqgrid = ((0:(Nt))/(Nt+1)-1/2)*36/hbar;          %THz
 %%
 %------------------------------------------------------------
 N1=100;                 %number of points of phi
@@ -45,11 +46,10 @@ for i=1:N
 end
 y1=y;
 a=1:N1;
-
 b=pi/(N1+1)*(a-(N1+1)/(2*pi) *sin((2*pi*a)/(N1+1)));
 w=pi/(N1+1)*(1-cos(2*pi*a/(N1+1)));
-
 d=zeros(N,N);
+
  for j=1:N
 %%  finer grid for removing singularity
     y2=y1(j)-dN/2+((1:N2)-1/2)*dN/N2;
@@ -104,22 +104,21 @@ end
 %%
 subplot(3,1,1)
 
-plot(abs(p(:,end).^2))
+plot(y, abs(p(:,end).^2))
 head = sprintf('%s    |Pk|^2 at the end', date);
 title(head)
 
 subplot(3,1,2)
-h = area(time, Et/max(Et));
+h = area(time, (Et/max(Et)).^2);
 h.FaceColor = 0.8*[1,1,1];
 h.LineStyle = 'None';
 h.ShowBaseLine = 'off';
 hold on
 
 plot(time,abs(pt).^2/max(abs(pt).^2))
-
 hold on
 
-plot(time, sum(f)/max(sum(f)))
+plot(time, abs(sum(f))/max(abs(sum(f))))
 head = sprintf('%s    |P(t)|^2 ', date);
 title(head)
 
@@ -136,7 +135,7 @@ plot(freqgrid*hbar, imag(pfreq))
 title('Im[P({\omega})]')
 
 subplot(3,1,2)
-plot(freqgrid*hbar, imag(pfreq)./abs(Efreq))
+plot(freqgrid*hbar, -imag(pfreq)./abs(Efreq))
 title( 'Im[P({\omega})]/|E({\omega})|')
 
 subplot(3,1,3)
