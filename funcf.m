@@ -1,7 +1,24 @@
-function output = funcf(t, p)
-global Omegat
-omega_g = 3.2 * 1.6e-19 / (6.63e-34);
-% gamma = 0.2e12;
-% output=2*imag(Omegat(1) * exp(1i * omega_g * t) * p)/(6.63e-34);
-output=imag(Omegat(t) * p)*2;
+function output = funcf(j, p)
+ global Ebind dt sigmat tstart hbar A
+% output=(imag(conj(1e-3*exp(-(j*dt+tstart)^2/(sigmat)^2)+A*p).*p)*2)/hbar*Ebind; 
+%  output=(imag((1e-3*(j<51)/(50*dt)).*p)*2)*Ebind;
+ output = 0;
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
